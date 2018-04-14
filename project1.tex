@@ -1,0 +1,30 @@
+\documentclass[12pt]{article}
+
+
+\begin{document}
+  
+\title{Project 1}
+\author{Minh Le}
+\maketitle
+
+\section{Effective Sample Size}
+\subsection{Computing $\theta$}
+
+In this section, we examine the effectiveness of picking different $g(x)$ to compute $\theta = \int \sqrt{x^2 + y^2}\pi(x,y)dxdy$ 
+
+\begin{itemize}
+  \item For $\hat{\theta}_1$, we will draw from $\pi(x,y)$ directly.
+  
+  \item $\hat{\theta}_2$ will be drawn from g(x,y) a bivariate gaussian with parameters $\mu = (0,0)$ and $\sigma_0 = 1$ We assume independence between x and y.
+  
+  \item $\hat{\theta}_3$ will be drawn from g(x,y) a bivariate gaussian with parameters $\mu = (0,0)$ and $\sigma_0 = 1$ We assume independence between x and y.
+\end{itemize}
+
+Comparing between $\hat{\theta}_2$ and $\hat{\theta}_3$, I believe that $\hat{\theta}_3$ will converge more quickly to $\theta$. This is because both models are drawn from a distribution whose mean is not the true mean $\mu=(2,2)$ meaning the masses of $g$ and $pi$ are not distributed in the same points. It is more likely for us to draw samples close to this the mass of $\pi$ from $g_3$ because of the larger standard deviation.  
+
+We clearly see this when plotting the estimated $theta$ for different $g$ distributions. We see that $\hat{\theta}_3$ converges to $\hat{\theta}_1$ baseline faster than $\hat{\theta}_2$ as n increases.
+  
+	
+\subsection{effective samples size}
+	ntes
+\end{document}
