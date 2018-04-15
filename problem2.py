@@ -74,14 +74,14 @@ def draw_SAW_sample():
 
 #experiment set up
 m = int(1e8)
-
+m = 12749584
 max_length = 0
 max_hist = None
 max_fin_length = 0
 max_fin_hist = None
 
-writer = csv.writer(open("problem2/1.csv",'w+'))
-fin_writer = csv.writer(open("problem2/fin_1.csv",'w+'))
+writer = csv.writer(open("problem2/1.csv",'a'))
+fin_writer = csv.writer(open("problem2/fin_1.csv",'a'))
 #TODO make this a batch instead
 #TODO multiprocessing
 for i in range(m):
