@@ -66,6 +66,22 @@ def draw_SAW_sample():
     sample = SAWSample(saw.length,px, saw.history)
     return sample,finishedSample
 
+def draw_finished_SAW_sample():
+    saw = SAW(10)
+    px = 1
+    attempts = 0
+    while True:
+        while saw.getNumValidMoves() > 0:
+            px *= saw.getNumValidMoves()
+            saw.randomMove()
+            if saw.pos == point(10,10):
+                return SAWSample(saw.length,px/attempts, saw.history)
+        attempts += 1
+    
+    sample = SAWSample(saw.length,px, saw.history)
+    return sample,finishedSample
+
+
 # def mc(iter=int(100),fname):
     #pool = mp.Pool(4)
     #future_samples = [pool.apply_async(draw_SAW_sample) for _ in range(iter)]
@@ -84,17 +100,24 @@ writer = csv.writer(open("problem2/1.csv",'a'))
 fin_writer = csv.writer(open("problem2/fin_1.csv",'a'))
 #TODO make this a batch instead
 #TODO multiprocessing
+# for i in range(m):
+    # samples, finished_samples = draw_SAW_sample()
+    # length, px,history = samples
+    # if max_length < length:
+        # max_length = length
+        # max_hist = history
+    # writer.writerow((length,px))
+    # if finished_samples:
+        # length, px,history = finished_samples
+        # if max_length < length:
+            # max_fin_length = length
+            # max_fin_hist = history
+        # fin_writer.writerow((length,px))
+
 for i in range(m):
-    samples, finished_samples = draw_SAW_sample()
+    samples  = draw_finished_SAW_sample()
     length, px,history = samples
     if max_length < length:
         max_length = length
         max_hist = history
-    writer.writerow((length,px))
-    if finished_samples:
-        length, px,history = finished_samples
-        if max_length < length:
-            max_fin_length = length
-            max_fin_hist = history
-        fin_writer.writerow((length,px))
-
+    fin_writer.writerow((length,px))
