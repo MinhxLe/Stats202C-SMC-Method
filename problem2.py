@@ -32,9 +32,9 @@ def draw_SAW_samples1(batch):
         samples.append(SAWSample(px,saw.length, saw.history))
     return samples, fin_samples
 #method 2 of computing px (epsilon)
-def draw_SAW_samples2():
+def draw_SAW_samples2(batch):
     saw = SAW(10)
-    epsilon = 1e-6
+    epsilon = 1e-8
     attempts = 0
     samples = []
     fin_samples = []
@@ -43,22 +43,22 @@ def draw_SAW_samples2():
         px = 1
         attempts += 1
         while saw.getNumValidMoves() > 0:
+            if np.random.random() < epsilon:
+                break
             px *= saw.getNumValidMoves()
             saw.randomMove()
             if saw.pos == point(10,10):
                 fin_samples.append(SAWSample(px/attempts, saw.length,saw.history))
                 attempts = 0
-            if np.random.random() > epsilon:
-                break
         samples.append(SAWSample(px,saw.length, saw.history))
     return samples, fin_samples
-def draw_SAW_samples3():
+def draw_SAW_samples3(batch):
     pass
 
-draw_sample_fns = [draw_SAW_samples1,draw_SAW_samples2, draw_SAW_samples3]
+draw_samples_fns = [draw_SAW_samples1,draw_SAW_samples2, draw_SAW_samples3]
 
 #argument parsing
-parser = argparse.ArguementParser()
+parser = argparse.ArgumentParser()
 
 parser.add_argument('--samples', help='number of samples', type=int)
 parser.add_argument('--batch', help='number of samples', type=int)
@@ -70,7 +70,7 @@ args = parser.parse_args()
 m = args.samples
 batch = args.batch
 fn_choice = args.fn
-draw_samples_fn = draw_saw_samples_fns[fn_choice] 
+draw_samples_fn = draw_samples_fns[fn_choice] 
 path_fname = "problem2/{}.csv".format(fn_choice)
 fin_path_fname = "problem2/fin_{}.csv".format(fn_choice)
 
@@ -79,7 +79,7 @@ max_hist = None
 fin_max_length = 0
 fin_max_hist = None
 
-n_fin_samples = 0
+n_fin_samples = 0 
 with open(path_fname, 'w+') as f,open(fin_path_fname,'w+') as fin_f:
     writer = csv.writer(f)
     fin_writer = csv.writer(fin_f)
