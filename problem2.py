@@ -2,122 +2,89 @@ from collections import namedtuple
 from enum import Enum
 import numpy as np
 import multiprocessing as mp
-import csv
+from SAW import SAW
+import h5py
+
 point = namedtuple('point', ['x','y'])
-class SAW:
-    def __init__(self, n):
-        self.pos = point(0,0)
-        self.grid = np.zeros([n+1,n+1],dtype=bool)
-        self.history =[point(0,0)]
-        self.length = 0
-        self.n = n
-    def isValidPos(self,pos):
-        return 0 <= pos.x and pos.x <= self.n \
-                and 0 <= pos.y and pos.y <= self.n \
-                and not self.grid[pos.x,pos.y]
-    def reset(self):
-        self.pos = point(0,0)
-        self.grid = np.zeros([self.n+1,self.n+1],dtype=bool)
-        self.length = 0
-    def randomMove(self):
-        p = self.pos
-        self.grid[p.x,p.y] = True #set current pos as traveled
-        directions = []
-        #right
-        if self.isValidPos(point(p.x+1,p.y)):
-            directions.append(point(p.x+1,p.y))    
-        #left
-        if self.isValidPos(point(p.x-1,p.y)): 
-            directions.append(point(p.x-1,p.y))    
-        #up        
-        if self.isValidPos(point(p.x,p.y-1)): 
-            directions.append(point(p.x,p.y-1))    
-        #down
-        if self.isValidPos(point(p.x,p.y+1)):
-            directions.append(point(p.x,p.y+1))
-        if len(directions) > 0:
-            self.pos = directions[np.random.randint(len(directions))]
-            self.history.append(self.pos)
-            self.length += 1
-    
-    def getNumValidMoves(self):
-        p = self.pos      
-        return self.isValidPos(point(p.x-1,p.y)) \
-                + self.isValidPos(point(p.x+1,p.y)) \
-                + self.isValidPos(point(p.x,p.y-1)) \
-                + self.isValidPos(point(p.x,p.y+1))
-    def generateDisplay(self):
-        pass
-
-
 
 
 SAWSample = namedtuple('SAWSample', \
-        ['length','px','history'])
-def draw_SAW_sample():
-    saw = SAW(10)
-    px = 1
-    finishedSample = None
-    while saw.getNumValidMoves() > 0:
-        px *= saw.getNumValidMoves()
-        saw.randomMove()
-        if saw.pos == point(10,10):
-            finishedSample = SAWSample(saw.length,px, saw.history)
-    sample = SAWSample(saw.length,px, saw.history)
-    return sample,finishedSample
+        ['px','length','history'])
 
-def draw_finished_SAW_sample():
+#method 1 of computing px
+def draw_SAW_samples1(batch):
     saw = SAW(10)
     px = 1
     attempts = 0
+    samples = []
+    fin_samples = []
+   
+    for b in range(batch):
+        saw.reset()
+        attempts += 1
+        while saw.getNumValidMoves() > 0:
+            px *= saw.getNumValidMoves()
+            saw.randomMove()
+            if saw.pos == point(10,10):
+                fin_samples.append(SAWSample(px/attempts, saw.length,saw.history))
+        samples.append(SAWSample(px,saw.length, saw.history))
+    return samples, fin_samples
+#method 1 of computing px
+def draw_finished_SAW_sample1():
+    saw = SAW(10)
+    attempts = 1
     while True:
+        px = 1
+        saw.reset()
         while saw.getNumValidMoves() > 0:
             px *= saw.getNumValidMoves()
             saw.randomMove()
             if saw.pos == point(10,10):
                 return SAWSample(saw.length,px/attempts, saw.history)
         attempts += 1
-    
-    sample = SAWSample(saw.length,px, saw.history)
-    return sample,finishedSample
+    return None
+
+#method 2 of computing px
 
 
-# def mc(iter=int(100),fname):
-    #pool = mp.Pool(4)
-    #future_samples = [pool.apply_async(draw_SAW_sample) for _ in range(iter)]
-    #samples = [f.get() for f in future_samples]
-    #return samples
+def draw_SAW_sample2():
+    pass
+
 
 #experiment set up
-m = int(1e8)
-m = 12749584
+m = 10
+batch = 3
+draw_samples_fn = draw_SAW_samples1
+path_fname = "test.h5"
+fin_path_fname = "fin_test.h5"
+
 max_length = 0
 max_hist = None
-max_fin_length = 0
-max_fin_hist = None
+fin_max_length = 0
+fin_max_hist = None
 
-writer = csv.writer(open("problem2/1.csv",'a'))
-fin_writer = csv.writer(open("problem2/fin_1.csv",'a'))
-#TODO make this a batch instead
-#TODO multiprocessing
-# for i in range(m):
-    # samples, finished_samples = draw_SAW_sample()
-    # length, px,history = samples
-    # if max_length < length:
-        # max_length = length
-        # max_hist = history
-    # writer.writerow((length,px))
-    # if finished_samples:
-        # length, px,history = finished_samples
-        # if max_length < length:
-            # max_fin_length = length
-            # max_fin_hist = history
-        # fin_writer.writerow((length,px))
+with h5py.File(path_fname, 'w') as f,h5py.File(fin_path_fname,'w') as fin_f:
+    dset = f.create_dataset('paths_info',(0,2),maxshape=(None,2),dtype='f',chunks=(batch,2))
+    fin_dset = fin_f.create_dataset('fin_paths_info',(0,2),maxshape=(None,2),dtype='f',chunks=(batch,2))
 
-for i in range(m):
-    samples  = draw_finished_SAW_sample()
-    length, px,history = samples
-    if max_length < length:
-        max_length = length
-        max_hist = history
-    fin_writer.writerow((length,px))
+    while m > 0:
+        samples,fin_samples = draw_samples_fn(batch=batch)
+        n_samples = len(samples)
+        data = np.array([(sample.px, sample.length) for sample in samples]).astype(float)
+
+        batch_max_idx = np.argmax(data[:,1])
+        if max_length < data[batch_max_idx,1]:
+            max_length = data[batch_max_idx,1]
+            max_hist = samples[batch_max_idx].history
+        dset.resize(dset.shape[0]+n_samples,axis=0) 
+        dset[-n_samples:] = data
+        
+        data = np.array([(sample.px, sample.length) for sample in fin_samples]).astype(float)
+        if len(data) > 0:
+            batch_max_idx = np.argmax(data[:,1])
+            if fin_max_length < data[batch_max_idx,1]:
+                fin_max_length = data[batch_max_idx,1]
+                fin_max_hist = samples[batch_max_idx].history
+            fin_dset.resize(dset.shape[0]+n_samples,axis=0) 
+            fin_dset[-n_samples:] = data
+            m -= n_samples
