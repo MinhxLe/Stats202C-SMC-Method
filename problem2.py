@@ -4,6 +4,8 @@ import numpy as np
 import multiprocessing as mp
 from SAW import SAW
 import csv
+import pickle
+import argparse
 
 point = namedtuple('point', ['x','y'])
 
@@ -29,7 +31,7 @@ def draw_SAW_samples1(batch):
                 attempts = 0
         samples.append(SAWSample(px,saw.length, saw.history))
     return samples, fin_samples
-#method 2 of computing px
+#method 2 of computing px (epsilon)
 def draw_SAW_sample2():
     saw = SAW(10)
     epsilon = 1e-6
@@ -51,9 +53,19 @@ def draw_SAW_sample2():
         samples.append(SAWSample(px,saw.length, saw.history))
     return samples, fin_samples
 
+#argument parsing
+parser = argparse.ArguementParser()
+
+parser.add_argument('--samples', help='number of samples', type=int)
+parser.add_argument('--batch', help='number of samples', type=int)
+parser.add_argument('--fn', help='number of samples', type=int)
+#TODO parameter checking
+args = parser.parse_args()
+
 #experiment set up
-m = 1000000
-batch =10000 
+m = args.samples
+batch = args.batch
+fn_choice = args.fn
 draw_samples_fn = draw_SAW_samples1
 path_fname = "problem2/2.csv"
 fin_path_fname = "problem2/fin_2.csv"
@@ -87,3 +99,9 @@ with open(path_fname, 'w+') as f,open(fin_path_fname,'w+') as fin_f:
                 fin_max_hist = samples[batch_max_idx].history
             m -= n_samples
         fin_writer.writerows(data)
+
+#save max history with pickle
+with open('problem2/max_length_{}.pkl'.format(fn_choice),'wb') as f:
+    pickle.dump(max_hist,f)
+with open('problem2/fin_max_length_{}.pkl'.format(fn_choice),'wb') as f:
+    pickle.dump(fin_max_hist,f)
