@@ -70,7 +70,7 @@ with h5py.File(path_fname, 'w') as f,h5py.File(fin_path_fname,'w') as fin_f:
     while m > 0:
         samples,fin_samples = draw_samples_fn(batch=batch)
         n_samples = len(samples)
-        data = np.array([(sample.px, sample.length) for sample in samples]).astype(float)
+        data = np.array([(sample.length,sample.px) for sample in samples]).astype(float)
 
         batch_max_idx = np.argmax(data[:,1])
         if max_length < data[batch_max_idx,1]:
@@ -79,7 +79,7 @@ with h5py.File(path_fname, 'w') as f,h5py.File(fin_path_fname,'w') as fin_f:
         dset.resize(dset.shape[0]+n_samples,axis=0) 
         dset[-n_samples:] = data
         
-        data = np.array([(sample.px, sample.length) for sample in fin_samples]).astype(float)
+        data = np.array([(sample.length,sample.px) for sample in fin_samples]).astype(float)
         if len(data) > 0:
             batch_max_idx = np.argmax(data[:,1])
             if fin_max_length < data[batch_max_idx,1]:
