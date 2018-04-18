@@ -32,7 +32,7 @@ def draw_SAW_samples1(batch):
         samples.append(SAWSample(px,saw.length, saw.history))
     return samples, fin_samples
 #method 2 of computing px (epsilon)
-def draw_SAW_sample2():
+def draw_SAW_samples2():
     saw = SAW(10)
     epsilon = 1e-6
     attempts = 0
@@ -52,6 +52,10 @@ def draw_SAW_sample2():
                 break
         samples.append(SAWSample(px,saw.length, saw.history))
     return samples, fin_samples
+def draw_SAW_samples3():
+    pass
+
+draw_sample_fns = [draw_SAW_samples1,draw_SAW_samples2, draw_SAW_samples3]
 
 #argument parsing
 parser = argparse.ArguementParser()
@@ -66,9 +70,9 @@ args = parser.parse_args()
 m = args.samples
 batch = args.batch
 fn_choice = args.fn
-draw_samples_fn = draw_SAW_samples1
-path_fname = "problem2/2.csv"
-fin_path_fname = "problem2/fin_2.csv"
+draw_samples_fn = draw_saw_samples_fns[fn_choice] 
+path_fname = "problem2/{}.csv".format(fn_choice)
+fin_path_fname = "problem2/fin_{}.csv".format(fn_choice)
 
 max_length = 0
 max_hist = None
