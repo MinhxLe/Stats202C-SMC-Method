@@ -2,9 +2,6 @@ from scipy.stats import norm
 import numpy as np
 import matplotlib.pyplot as plt
 #Problem 1
-mu = 2
-sigma = 1
-pi_function = np.vectorize(lambda x : norm.pdf(x,mu,sigma))
 
 def mc_estimate(mu0,sigma0, n):
     '''
@@ -19,50 +16,50 @@ def mc_estimate(mu0,sigma0, n):
     pi_values = np.product(pi_values,axis=1)
     g_values = np.product(g_values,axis=1)
     weights = pi_values / g_values
-    theta_hat = np.mean(f_samples * weights)
-    ess = n/(1+np.var(weights))
-    return theta_hat,ess
+    
+    return f_samples,weights
+    
 
-n_samples = [10**i for i in range(1,7)]
-n_samples.append([5e6,1e7])
+#exp set up
+n_samples = 10**7
+n_points = 100
+#problem 1
+mu = 2
+sigma = 1
+pi_function = np.vectorize(lambda x : norm.pdf(x,mu,sigma))
+l_n_samples = [i*n_samples//n_points for i in range(1,n_samples//n_points)]
 #theta1
 mu0 = 2
 sigma0 = 1
-theta1 = []
-ess1 = []
-print("theta1")
-for n in n_samples2:
-    theta_hat,ess = mc_estimate(mu0, sigma0, n)
-    print("n:{} theta:{}".format(n,theta_hat))
-    theta1.append(theta_hat)
-    ess1.append(ess)
+f_samples,weights = mc_estimate(mu0, sigma0, n_samples)
+weighted_fsamples = f_samples*weights
+theta1 = [np.mean(weighted_fsamples[:n]) for n in l_n_samples]
+ess1 = [n/(1+np.var(weights[:n])) for n in l_n_samples]
+
+
 #theta2
 mu0 = 0
 sigma0 = 1
-theta2 = []
-ess2 = []
-print("theta2")
-for n in n_samples:
-    theta_hat,ess = mc_estimate(mu0, sigma0, n)
-    print("n:{} theta:{}".format(n,theta_hat))
-    theta2.append(theta_hat)
-    ess2.append(ess)
+f_samples,weights = mc_estimate(mu0, sigma0, n_samples)
+weighted_fsamples = f_samples*weights
+theta2 = [np.mean(weighted_fsamples[:n]) for n in l_n_samples]
+ess2 = [n/(1+np.var(weights[:n])) for n in l_n_samples]
+
 #theta3
 mu0 = 0
 sigma0 = 4
-theta3 = []
-ess3 = []
-print("theta3")
-for n in n_samples:
-    theta_hat,ess = mc_estimate(mu0, sigma0, n)
-    print("n:{} theta:{}".format(n,theta_hat))
-    theta3.append(theta_hat)
-    ess3.append(ess)
+f_samples,weights = mc_estimate(mu0, sigma0, n_samples)
+weighted_fsamples = f_samples*weights
+theta3 = [np.mean(weighted_fsamples[:n]) for n in l_n_samples]
+ess3 = [n/(1+np.var(weights[:n])) for n in l_n_samples]
 
-log_n = np.log10(n_samples)
-plt.plot(log_n, theta1,label="theta1")
-plt.plot(log_n, theta2,label="theta2")
-plt.plot(log_n, theta3,label="theta3")
+
+
+
+l_log_n_samples = np.log10(l_n_samples)
+plt.plot(l_log_n_samples, theta1,label="theta1")
+plt.plot(l_log_n_samples, theta2,label="theta2")
+plt.plot(l_log_n_samples, theta3,label="theta3")
 plt.xlabel("number samples (log10n)")
 plt.ylabel("theta_hat")
 plt.legend()
@@ -71,8 +68,6 @@ plt.show()
 
 
 #looking at graph, we see 
-plt.plot(log_n,ess2/ess2[5],label="ess theta2")
-plt.plot(log_n,ess3/ess3[2],label="ess theta3")
 
 plt.xlabel("number samples (log10n)")
 plt.ylabel("ess(n)/ess*(n)")
