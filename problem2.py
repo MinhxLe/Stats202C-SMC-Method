@@ -71,7 +71,7 @@ def draw_SAW_samples2(batch):
     fin_samples = []
     do_branch = False
     n_split = 5
-    for b in range(batch):
+    while batch > len(samples):
         saw.reset()
         px = 1
         attempts += 1
@@ -85,8 +85,14 @@ def draw_SAW_samples2(batch):
                 do_branch = True
                 for i in range(0,n_split):
                     sample,fin_sample = continue_SAW_sample2(saw,px,attempts,n_split)
+                    did_finish = False
                     if fin_sample:
                         fin_samples.append(fin_sample)
+                        did_finish = True
+                    else:
+                        attempts += 1
+                    if did_finish:
+                        attempts = 0
                     samples.append(sample)
                 break
         if not do_branch:
