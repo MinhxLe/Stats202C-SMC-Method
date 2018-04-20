@@ -14,6 +14,7 @@ else:
     fin_str = ""
 data = None
 checked = False
+max_len=int(1e7)
 for fname in glob.glob("./problem2/{}fn{}/*.csv".format(fin_str,args.fn)):
     if os.stat(fname).st_size == 0:
         continue
@@ -23,6 +24,8 @@ for fname in glob.glob("./problem2/{}fn{}/*.csv".format(fin_str,args.fn)):
         checked = True
     else:
         data = np.append(data,fdata,axis=0)
+    if len(data) > max_len:
+        break
 print(len(data))
 
 

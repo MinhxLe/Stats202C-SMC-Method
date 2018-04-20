@@ -160,13 +160,14 @@ with open(path_fname, 'w+') as f,open(fin_path_fname,'w+') as fin_f:
         print(counter)
         samples,fin_samples = draw_samples_fn(batch=batch)
         data = np.array([(sample.px, sample.length) for sample in samples]).astype(float)
-        counter -= len(data)
         batch_max_idx = np.argmax(data[:,1])
         if max_length < data[batch_max_idx,1]:
             max_length = data[batch_max_idx,1]
             max_hist = samples[batch_max_idx].history
         writer.writerows(data)
         data = np.array([(sample.px, sample.length) for sample in fin_samples]).astype(float)
+        
+        counter -= len(data)
         if len(data) > 0:
             batch_max_idx = np.argmax(data[:,1])
             if fin_max_length < data[batch_max_idx,1]:
