@@ -20,11 +20,12 @@ def draw_SAW_samples0(batch):
     samples = []
     fin_samples = []
     for b in range(batch):
+        px = []
         saw.reset()
         px = 1
         attempts += 1
         while saw.getNumValidMoves() > 0:
-            px *= saw.getNumValidMoves()
+            px.append(saw.getNumValidMoves())
             saw.randomMove()
             if saw.pos == point(10,10):
                 fin_samples.append(SAWSample(px/attempts, saw.length,saw.history))
@@ -48,9 +49,9 @@ def draw_SAW_samples1(batch):
             px *= saw.getNumValidMoves()
             saw.randomMove()
             if saw.pos == point(10,10):
-                fin_samples.append(SAWSample(px/attempts, saw.length,saw.history))
+                fin_samples.append(SAWSample(np.prod(px)/attempts, saw.length,saw.history))
                 attempts = 0
-        samples.append(SAWSample(px,saw.length, saw.history))
+        samples.append(SAWSample(np.prod(px),saw.length, saw.history))
     return samples, fin_samples
 def continue_SAW_sample2(saw,px,attempts,split):
     saw = copy.deepcopy(saw) 
@@ -108,16 +109,20 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--samples', help='number of samples', type=int)
 parser.add_argument('--batch', help='number of samples', type=int)
 parser.add_argument('--fn', help='number of samples', type=int)
+parser.add_argument('--seed',type=int)
 #TODO parameter checking
+
+#seed
 args = parser.parse_args()
+np.random.seed(args.seed)
 
 #experiment set up
 m = args.samples
 batch = args.batch
 fn_choice = args.fn
 draw_samples_fn = draw_samples_fns[fn_choice] 
-path_fname = "problem2/{}.csv".format(fn_choice)
-fin_path_fname = "problem2/fin_{}.csv".format(fn_choice)
+path_fname = "problem2/fn{}/{}.csv".format(fn_choice,args.seed)
+fin_path_fname = "problem2/fin_fn{}/{}.csv".format(fn_choice,args.seed)
 
 max_length = 0
 max_hist = None
@@ -150,7 +155,7 @@ with open(path_fname, 'a+') as f,open(fin_path_fname,'a+') as fin_f:
             n_fin_samples += len(data)
             print(n_fin_samples)
 #save max history with pickle
-with open('problem2/max_length_{}.pkl'.format(fn_choice),'wb') as f:
+with open('problem2/fn{}/max_length{}.pkl'.format(fn_choice,args.choice),'wb') as f:
     pickle.dump(max_hist,f)
-with open('problem2/fin_max_length_{}.pkl'.format(fn_choice),'wb') as f:
+with open('problem2/fin_fn{}/max_length{}.pkl'.format(fn_choice,args.choice),'wb') as f:
     pickle.dump(fin_max_hist,f)
