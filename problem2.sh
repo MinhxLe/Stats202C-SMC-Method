@@ -11,10 +11,17 @@
 source /u/local/Modules/default/init/modules.sh
 module load anaconda/python3-4.2
 
-for i in {1..200}
+for i in {1..20}
 do
     COUNTER=$((COUNTER+1))
     if [[ $COUNTER -eq $SGE_TASK_ID ]]
     then
-	python problem2.py --batch 1000 --samples 50000 --seed $SGE_TASK_ID --fn 0 
-fi
+    SEED=$(($SGE_TASK_ID+$RANDOM))	
+    #python problem2.py --batch 50000 --samples 1000 --seed $SGE_TASK_ID --fn 0
+	#python problem2.py --batch 50000 --samples 1000 --seed $SEED --fn 0
+	#python problem2.py --batch 1000 --samples 50000 --seed $SGE_TASK_ID --fn 1
+    python problem2.py --batch 1000 --samples 50000 --seed $SEED --fn 1
+	#python problem2.py --batch 1 --samples 50 --fn 1 --seed $SEED
+	#python problem2.py --batch 50000 --samples 1000 --seed $SGE_TASK_ID --fn 2
+    fi
+done
