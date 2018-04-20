@@ -22,15 +22,14 @@ def draw_SAW_samples0(batch):
     for b in range(batch):
         px = []
         saw.reset()
-        px = 1
         attempts += 1
         while saw.getNumValidMoves() > 0:
             px.append(saw.getNumValidMoves())
             saw.randomMove()
-            if saw.pos == point(10,10):
-                fin_samples.append(SAWSample(px/attempts, saw.length,saw.history))
-                attempts = 0
-        samples.append(SAWSample(px,saw.length, saw.history))
+        if saw.pos == point(10,10):
+            fin_samples.append(SAWSample(np.prod(px)/attempts, saw.length,saw.history))
+            attempts = 0
+        samples.append(SAWSample(np.prod(px),saw.length, saw.history))
     return samples, fin_samples
 #method 2 of computing px (epsilon)
 def draw_SAW_samples1(batch):
@@ -48,9 +47,9 @@ def draw_SAW_samples1(batch):
                 break
             px *= saw.getNumValidMoves()
             saw.randomMove()
-            if saw.pos == point(10,10):
-                fin_samples.append(SAWSample(np.prod(px)/attempts, saw.length,saw.history))
-                attempts = 0
+        if saw.pos == point(10,10):
+            fin_samples.append(SAWSample(np.prod(px)/attempts, saw.length,saw.history))
+            attempts = 0
         samples.append(SAWSample(np.prod(px),saw.length, saw.history))
     return samples, fin_samples
 def continue_SAW_sample2(saw,px,attempts,split):
@@ -130,7 +129,7 @@ fin_max_length = 0
 fin_max_hist = None
 
 n_fin_samples = 0 
-with open(path_fname, 'a+') as f,open(fin_path_fname,'a+') as fin_f:
+with open(path_fname, 'w+') as f,open(fin_path_fname,'w+') as fin_f:
     writer = csv.writer(f)
     fin_writer = csv.writer(fin_f)
     counter = m
@@ -155,7 +154,7 @@ with open(path_fname, 'a+') as f,open(fin_path_fname,'a+') as fin_f:
             n_fin_samples += len(data)
             print(n_fin_samples)
 #save max history with pickle
-with open('problem2/fn{}/max_length{}.pkl'.format(fn_choice,args.choice),'wb') as f:
+with open('problem2/fn{}/max_length{}.pkl'.format(fn_choice,args.seed),'wb') as f:
     pickle.dump(max_hist,f)
-with open('problem2/fin_fn{}/max_length{}.pkl'.format(fn_choice,args.choice),'wb') as f:
+with open('problem2/fin_fn{}/max_length{}.pkl'.format(fn_choice,args.seed),'wb') as f:
     pickle.dump(fin_max_hist,f)
