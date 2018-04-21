@@ -2,9 +2,9 @@ import matplotlib.pyplot as plt
 from matplotlib.path import Path
 import matplotlib.patches as patches
 import pickle as pkl
-fn = 1
-seed = 4669
-path_fname  = 'problem2/fn{}/max_length{}.pkl'.format(fn,seed) 
+fn = 0
+seed = 17162
+path_fname  = 'problem2/path{}/max_length{}.pkl'.format(fn,seed) 
 with open(path_fname,'rb') as f:
     path = pkl.load(f)
 print(len(path))

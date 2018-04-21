@@ -19,6 +19,7 @@ class SAW:
         self.pos = point(0,0)
         self.grid = np.zeros([self.n+1,self.n+1],dtype=bool)
         self.length = 0
+        self.history = []
     def randomMove(self):
         p = self.pos
         self.grid[p.x,p.y] = True #set current pos as traveled

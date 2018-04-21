@@ -27,9 +27,9 @@ def draw_SAW_samples0(batch):
             px *= saw.getNumValidMoves()
             saw.randomMove()
         if saw.pos == point(10,10):
-            fin_samples.append(SAWSample(px/attempts, saw.length,copy.copy(saw.history)))
+            fin_samples.append(SAWSample(px/attempts, saw.length,copy.deepcopy(saw.history)))
             attempts = 0
-        samples.append(SAWSample(px,saw.length, copy.copy(saw.history)))
+        samples.append(SAWSample(px,saw.length, copy.deepcopy(saw.history)))
     return samples, fin_samples
 #method 2 of computing px (epsilon)
 def draw_SAW_samples1(batch):
@@ -48,9 +48,9 @@ def draw_SAW_samples1(batch):
             px *= saw.getNumValidMoves()/(1-epsilon)
             saw.randomMove()
         if saw.pos == point(10,10):
-            fin_samples.append(SAWSample(np.prod(px)/attempts, saw.length,copy.copy(saw.history)))
+            fin_samples.append(SAWSample(np.prod(px)/attempts, saw.length,copy.deepcopy(saw.history)))
             attempts = 0
-        samples.append(SAWSample(np.prod(px),saw.length, copy.copy(saw.history)))
+        samples.append(SAWSample(np.prod(px),saw.length, copy.deepcopy(saw.history)))
     return samples, fin_samples
 
 #method 3 of computing px (epsilon)
@@ -178,8 +178,8 @@ with open(path_fname, 'w+') as f,open(fin_path_fname,'w+') as fin_f:
     fin_f.flush()
 #save max history with pickle
 if max_hist:
-    with open('problem2/fn{}/max_length{}.pkl'.format(fn_choice,args.seed),'wb') as f:
+    with open('problem2/path{}/max_length{}.pkl'.format(fn_choice,args.seed),'wb') as f:
         pickle.dump(max_hist,f)
 if fin_max_hist:
-    with open('problem2/fin_fn{}/max_length{}.pkl'.format(fn_choice,args.seed),'wb') as f:
+    with open('problem2/path{}/fin_max_length{}.pkl'.format(fn_choice,args.seed),'wb') as f:
         pickle.dump(fin_max_hist,f)
