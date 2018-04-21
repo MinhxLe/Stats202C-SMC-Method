@@ -22,6 +22,7 @@ class SAW:
         self.history = []
     def randomMove(self):
         p = self.pos
+        self.history.append(p)
         self.grid[p.x,p.y] = True #set current pos as traveled
         directions = []
         #right
@@ -38,7 +39,6 @@ class SAW:
             directions.append(point(p.x,p.y+1))
         if len(directions) > 0:
             self.pos = directions[np.random.randint(len(directions))]
-            self.history.append(self.pos)
             self.length += 1
     
     def getNumValidMoves(self):

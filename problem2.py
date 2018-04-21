@@ -15,13 +15,12 @@ SAWSample = namedtuple('SAWSample', \
 
 #method 1 of computing px
 def draw_SAW_samples0(batch):
-    saw = SAW(10)
     attempts = 0
     samples = []
     fin_samples = []
     for b in range(batch):
+        saw = SAW(10)
         px = 1
-        saw.reset()
         attempts += 1
         while saw.getNumValidMoves() > 0:
             px *= saw.getNumValidMoves()
@@ -29,17 +28,19 @@ def draw_SAW_samples0(batch):
         if saw.pos == point(10,10):
             fin_samples.append(SAWSample(px/attempts, saw.length,copy.deepcopy(saw.history)))
             attempts = 0
+        
+            with open('problem2/path0/fin_max_length{}.pkl'.format(0),'wb') as f:
+                pickle.dump(saw.history,f)
         samples.append(SAWSample(px,saw.length, copy.deepcopy(saw.history)))
     return samples, fin_samples
 #method 2 of computing px (epsilon)
 def draw_SAW_samples1(batch):
-    saw = SAW(10)
     epsilon = 1e-8
     attempts = 0
     samples = []
     fin_samples = []
     for b in range(batch):
-        saw.reset()
+        saw = SAW(10)
         px = 1
         attempts += 1
         while saw.getNumValidMoves() > 0:
@@ -50,18 +51,20 @@ def draw_SAW_samples1(batch):
         if saw.pos == point(10,10):
             fin_samples.append(SAWSample(np.prod(px)/attempts, saw.length,copy.deepcopy(saw.history)))
             attempts = 0
+
+            with open('problem2/path1/fin_max_length{}.pkl'.format(0),'wb') as f:
+                pickle.dump(saw.history,f)
         samples.append(SAWSample(np.prod(px),saw.length, copy.deepcopy(saw.history)))
     return samples, fin_samples
 
 #method 3 of computing px (epsilon)
 def draw_SAW_samples2(batch):
-    saw = SAW(10)
     epsilon = 1e-8
     attempts = 0
     samples = []
     fin_samples = []
     for b in range(batch):
-        saw.reset()
+        saw = SAW(10)
         px = 1
         attempts += 1
         epsilon=1e-8
@@ -72,9 +75,12 @@ def draw_SAW_samples2(batch):
             px *= saw.getNumValidMoves()/(1-epsilon)
             saw.randomMove()
         if saw.pos == point(10,10):
-            fin_samples.append(SAWSample(np.prod(px)/attempts, saw.length,copy.copy(saw.history)))
+            fin_samples.append(SAWSample(np.prod(px)/attempts, saw.length,saw))
             attempts = 0
-        samples.append(SAWSample(np.prod(px),saw.length, copy.copy(saw.history)))
+        
+            with open('problem2/path2/fin_max_length{}.pkl'.format(0),'wb') as f:
+                pickle.dump(saw.history,f)
+        samples.append(SAWSample(np.prod(px),saw.length,saw))
     return samples, fin_samples
 def continue_SAW_sample3(saw,px,attempts,split):
     saw = copy.deepcopy(saw) 
